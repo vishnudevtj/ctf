@@ -1,6 +1,6 @@
 # pwnage
 
-Creates a template exploit script for CTF based pwn challenges . Basically many of the pwn challenges are menu driven and we have to write a wrapper function to interact with each menu which the binary provide , offcource we will be using pwntools , process of copying the binary's output create those fuctions are tedious .
+Creates a template exploit script for CTF based pwn challenges . Basically many of the pwn challenges are menu driven and we have to write a wrapper function to interact with each menu which the binary provide , of course we will be using pwntools , process of copying the binary's output create those functions are tedious .
 
 Mostly a specific input will trigger the menu entry, so first we will define new menu entry with
 
@@ -10,7 +10,7 @@ Further these menu entry will require some input , so to define a argument
 
     arg <arg_name> inp
 
-After a function defenition all the arg definition will assign argument to that fuction untill another fuction is defined .
+After a function definition all the arg definition will assign argument to that function until another function is defined .
 
 And the end command will write the created script to file
 

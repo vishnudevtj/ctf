@@ -7,7 +7,7 @@ class Base:
     def __init__(self,path,host='',port=0):
         '''
         Create template for the exploit script for Heap
-        based challeges .
+        based challenges .
         [K]eywords :
            def <name> <entry> : creates new function 
            arg <name> <input> : adds corresponding argument to the function
