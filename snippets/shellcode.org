@@ -1,0 +1,60 @@
+# -*- eval: (let () (org-babel-goto-named-src-block "init") (org-babel-execute-src-block)); -*-
+#+TITLE:     Shellcode Generator
+#+AUTHOR:    Vishnu Dev TJ
+#+EMAIL:     vishnudevtj@gmail.com
+#+STARTUP: content
+
+#+BEGIN_SRC rasm2 :arch arm :bits 32 
+mov r1, 4 
+#+END_SRC
+
+#+RESULTS:
+: \x04\x10\xa0\xe3
+
+
+
+* Shellcodes 
+** x86
+*** 32 bit 
+**** init 
+#+NAME: init
+#+BEGIN_SRC emacs-lisp
+(require 'ob)
+
+
+(defconst org-babel-header-args:rasm2
+  '((:arch . :any)
+    (:bits  . :any)
+    (:disasm . :any)
+    )
+  "Rasm2 specific header arguments.")
+
+
+(defun org-babel-execute:rasm2 (body params)
+  "Execute a block of sed code with Org Babel.
+BODY is the source inside a sed source block and PARAMS is an
+association list over the source block configurations.  This
+function is called by `org-babel-execute-src-block'."
+
+  (let* ((arch (cdr (assq :arch params)))
+	 (bits (cdr (assq :bits params))))
+    (if  (assq :disasm params)
+	(shell-command-to-string
+	 (concat "rasm2 -a  " arch " -b " (number-to-string bits) " -d \"" body "\"" ))
+      (with-temp-buffer
+	(insert (shell-command-to-string
+		 (concat "rasm2 -C -a " arch " -b " (number-to-string bits) " \"" body "\"" )))
+	(goto-char (point-min))
+	(while (re-search-forward "\"" nil t )
+	  (replace-match ""))
+	(goto-char (point-min))
+	(while (re-search-forward "\n" nil t )
+	  (replace-match ""))
+	(buffer-string)
+	)))
+  )
+
+#+END_SRC
+
+#+RESULTS: init
+: org-babel-execute:rasm2
