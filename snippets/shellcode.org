@@ -12,11 +12,13 @@ mov r1, 4
 : \x04\x10\xa0\xe3
 
 
-
 * Shellcodes 
 ** x86
 *** 32 bit 
-**** init 
+* init 
+
+For more details see : [[https://vishnudevtj.github.io/notes/wrting-shellcode-in-emacs][Wrting Shellcode In Emacs]]
+
 #+NAME: init
 #+BEGIN_SRC emacs-lisp
 (require 'ob)
@@ -58,3 +60,4 @@ function is called by `org-babel-execute-src-block'."
 
 #+RESULTS: init
 : org-babel-execute:rasm2
+
