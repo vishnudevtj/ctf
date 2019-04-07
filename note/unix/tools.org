@@ -1,0 +1,524 @@
+#+FILETAGS: :unix:tools:
+* Sed	                                                     :text:sed:
+
+Sed Sream EDitor is a powerfull unix tools for text processing
+
+** The essential Sed command
+The Most usefull command of sed is s : Substitution Command
+
+sed s/PATTERN/REPALCE/
+s : substitution command
+/../../ : Delimiter	                      ~We can also use : | _ as delimiters |..|..| usefull / shound we used in pattern/replace~
+PATTHERN : Regular expression Pattern Search
+REPLACE : Replacement string
+
+#+BEGIN_SRC shell
+echo old is gold | sed 's/old/gold/'
+#+END_SRC
+The substitute command replace the pattern/Regex with the replacement 
+We must be carefull because computer does what we tell it to do
+#+BEGIN_SRC shell
+echo Sunday | sed s/day/night/
+#+END_SRC
+will replace day inside the word beacuse we told it to replace every occurence of day with night
+** -r For Extended Regular Expression
+Unlock the full potential of Regular expression
+** & As Replacement string
+ sometimes we need to search for a pattern and add something to it example add paranthesis around it 
+#+BEGIN_SRC shell
+echo abc def | sed 's/abc/(abc)/'
+#+END_SRC
+using 1&
+#+BEGIN_SRC shell
+echo abc def | sed 's/abc/(&)/'
+#+END_SRC
+
+#+BEGIN_SRC shell
+echo abc def | sed 's/abc/(&) [&] {&}/'
+#+END_SRC
+** Grouping with () and Refering them with /NUM 
+We can group the Pattern and can refer them back with /NUM
+/1 - first remembered pattern sed support 9 of them
+Swapping Two Words around 
+
+#+BEGIN_SRC shell
+echo abc def | sed -r 's/([a-z][a-z]*) ([a-z][a-z]*)/\2 \1/'
+#+END_SRC
+With -r Extenden Regular Expression
+#+BEGIN_SRC shell
+echo abc def | sed -r 's/([a-z]+) ([a-z]+)/\2 \1/'
+#+END_SRC
+Revesing First three letter of a line
+#+BEGIN_SRC shell
+echo viLe Free or Die Trying | sed -r 's/(.)(.)(.)/\3\2\1/'
+#+END_SRC
+
+** Pattern Flag
+We can add additional flags after the delimiter 
+/g - global replacement : replaces every instance of pattern in line 
+#+BEGIN_SRC shell
+echo Live Free Or Die Trying | sed -r 's/[a-zA-Z]+/_&_/g'
+#+END_SRC
+
+/1 , /2 
+With no flags, the first matched substitution is changed. With the "g" option, 
+all matches are changed. If you want to modify a particular pattern that is not the first one on the line, we use this flag
+#+BEGIN_SRC shell
+echo abc abc abc | sed 's/abc/_&_/2'
+#+END_SRC
+
+/p - flag will cause the modified line to be printed
+/I - Ignore Case
+/w <file name > - wirite to a file
+
+Note: the flaga can be combined
+
+** -e can be used to combibe multiple command 
+#+BEGIN_SRC shell
+echo abc def | sed -e 's/a/A/' -e 's/d/D/'
+#+END_SRC
+** -n
+The "-n" option will not print anything unless an explicit request to print is found.
+It can be combined with /p flag to get the funtion of grep
+#+BEGIN_SRC shell
+sed -n 's/PATTERN/&/p' file
+#+END_SRC
+will print all the lines containing the PATTERN
+
+** Address
+Normally sed search and repalce entire input . we can tell sed to only act on specific part 
+
+*** Specifying a line by its number.
+Simple restriction is to specify the line number 
+#+BEGIN_SRC shell
+sed '2 s/../../'
+#+END_SRC
+only acts on the second line 
+~$ : specifies the last line~
+
+*** Specifying a range of lines by number.
+Range of line can also be specified 
+#+BEGIN_SRC shell
+sed '1,100 s/../../'
+#+END_SRC
+Acts on the 1-100 line 
+*** All lines containing a pattern.
+Pattern can we used to select the line were a command should be executed 
+#+BEGIN_SRC shell
+sed '/PATTERN/ s/../../'
+#+END_SRC
+*** All lines from the beginning of a file to a regular expression
+#+BEGIN_SRC shell
+sed '1,/STOP/ s/../../'
+#+END_SRC
+*** All lines from a regular expression to the end of the file.
+#+BEGIN_SRC shell
+sed '/START/,$ s/../../'
+#+END_SRC
+*** All lines between two regular expressions. 
+#+BEGIN_SRC shell
+sed '/START/,/STOP/ s/../../'
+#+END_SRC
+Acts between the patterns START and STOP
+
+** Delete Command
+d : The delete command can be used to delete the line
+making sed behave like head 
+#+BEGIN_SRC shell
+sed '11,$ d' < file
+#+END_SRC
+will display the first 10 lines of file
+** Print Command
+If print command is not startede with -n it will duplicate the input 
+#+BEGIN_SRC shell
+sed -n '200,300 p'
+#+END_SRC
+Will print the line from 200 - 300
+#+BEGIN_SRC shell
+sed -n '/PATTERN/ p'
+#+END_SRC
+Grep
+** ! Not Command
+It runs on all the lines exept the rage specified
+#+BEGIN_SRC shell
+sed -n '/PATTERN/ !p'
+#+END_SRC
+will	print all lines exept the lines containg PATTERN
+** y Transform Command 
+sed can act as the	unix tr command 
+#+BEGIN_SRC shell
+sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/' <uppercase >lowercase
+#+END_SRC
+
+** Footnote 
+1.[[man:sed][sed Manual]]
+2.[[www.grymoire.com/Unix/Sed.htm][Grymoire]] : Very Interesting 
+
+
+* Find	                                                    :find:
+
+Find is your best friend  , who can find anything 
+#+BEGIN_SRC shell
+find . -print
+#+END_SRC
+
+** -name 
+~-name~ is used to search file with purticular name or pattern
+#+BEGIN_SRC shell
+find . -name "*.sh"
+#+END_SRC
+Finds all the shell script in the current folder and in the subfolders
+~-iname~ can be used to ignore case
+** -type
+~-type~ is used to speciffy different types of file 
+| key | discription |
+|-----+-------------|
+| d	 | Directory   |
+| f	 | file        |
+| l	 | link        |
+
+#+BEGIN_SRC shell
+find . -type d -name "dir_name"
+#+END_SRC
+Searches for directory named dir_name
+
+** -size
+~-size~ specifies the size of the file +<size> looks for files greater that the <size> , -<size> looks for the files with size less than <size>
+#+BEGIN_SRC shell
+find . -type f -size +1G -size -3G
+#+END_SRC
+prints all the file with size greater than 1GB and less than 3GB.
+** -mtime
+~-mtime~ the modified time , let you search files with its modified time
+#+BEGIN_SRC shell
+find . -mtime 0
+#+END_SRC
+list of all files which was modified today
+#+BEGIN_SRC shell
+find . -mtime -6
+#+END_SRC
+list of all files wich are 6 days old
+** -perm
+~-perm~ permission
+
+find . -perm 664
+
+Search for	files which have  read and write  permission for their owner, and  group, but which other users  can read but
+not	write to.   Files which  meet these  criteria but  have other  permissions  bits set  (for  example  if someone  can
+execute the file) will not be matched.
+
+find . -perm -664
+
+Search for	files which have  read and write  permission for their  owner and  group,  and which  other  users can  read,
+without regard to the presence	of any extra permission bits (for example  the executable bit).   This will match  a file
+which has mode 0777, for example.
+
+find . -perm /222
+
+Search	for  files which  are  writable  by somebody  (their owner, or their group, or anybody else).
+
+find . -perm /220
+find . -perm /u+w,g+w
+find . -perm /u=w,g=w
+
+All three of these commands do the same thing, but the first one uses the octal representation	of the file mode, and the
+other two use the symbolic	form.  These commands all search for files which are writable  by either their owner or their
+group.	 The files  don't have  to be  writable by  both the owner and group to be matched; either will do.
+
+find . -perm -220
+find . -perm -g+w,u+w
+
+Both	these commands  do the  same thing;  search for  files which are writable by both their owner and their group.
+
+find . -perm -444 -perm /222 \! -perm /111
+find . -perm -a+r -perm /a+w \! -perm /a+x
+
+These two commands	both search for files  that are readable for everybody ( -perm -444 or -perm -a+r), have at least one
+write	bit set  (  -perm /222  or -perm  /a+w)  but are  not executable  for anybody  ( !  -perm  /111 and  ! -perm  /a+x
+respectively).
+** -user and -group
+~-user~ files owned by a specific user
+~-group~ files owned by specific groupA
+** xargs
+[[man:xargs][xargs]] can be used to execute a cetain command on the find output
+#+BEGIN_SRC shell
+find . -print0 | xargs -0 ls -lah
+#+END_SRC 
+~-print0~ print the full file	name on the standard output, followed by  a null  character (instead of  the newline
+character that	-print uses).   This allows  file names that contain newlines or other  types of white space to
+be correctly	interpreted by programs that  process the find output.  This option  corresponds to the -0 option
+of xargs.
+
+** Operators
+(..) can be used to incerase the precidence of a operator ,they should be escaped \(..\)
+
+~-a or -and~ the and operator
+~! or -not~ the not operator
+~-o or -or~ the or operator
+** -delete
+~-delete~ all found results
+** -exec
+~exec~ is used to execute a command 
+#+BEGIN_SRC find
+find . -type f -size	+10G -exec rm "{}" \;
+#+END_SRC
+removes all the files in the directory size greater than 10GB the {} and ; are escaped since they are special char in shell
+{} is repaces with the file name
+
+we can use xargs rather than -exec
+** -printf
+~-printf~ is used to format the result, there are many options
+refer : [[man:find][find]] 
+* AWK	                                                     :text:tools:
+AWK is a great tools for processing rows and colums of text .	It can be considered to be a pseudo-C interpretor,
+as it understands the same arithmatic operators as C.
+Basic syntax of awk is :
+~pattern {action}/~
+AWK is a line oriented program. ie, the pattern specifies a test that is performed on each line . it the result is true the action
+is done 
+BEGIN { print "START" }
+	    { print         }
+END	 { print "STOP"  }
+The BEGIN and END are exiecuted before and afer reading of line .
+#+BEGIN_SRC shell
+awk 'BEGIN {print "START"}\
+{print "ACTIONS"}\
+END {print "STOP"}'
+
+#+END_SRC
+
+#+BEGIN_SRC shell :output raw
+	printf "UNIX\t100\nLINUX\t50" | awk '{print $2,$1}'
+#+END_SRC
+
+$NUM can be used to specify the colum	 
+
+** Arithmatic Operation
+AWK support all the c arithmatic operations
+| +	 | Addition       |
+| -	 | Subtraction    |
+| "*" | Multiplication |
+| "/" | Division	     |
+| %	 | Modulo         |
+x++; x--;
+
+** Assignment : variable = arithmatic_expression
+#+BEGIN_EXAMPLE
+x += 1
+x =1+(3*7)
+#+END_EXAMPLE
+
+
+
+~As mentioned above it has c like syntax and the for , if ,while all are possible with c like syntax
+
+** Biuld in Variable
+- ~FS~ This variable contains the Field Seperator -F option can be specified to awk to change the field sepetator
+- ~OFS~ The output fied seperator 
+- ~NF~ Number of field
+- ~NR~ Number of records/line
+- ~RS~ Record seperator variable 
+- ~FILENAME~ Current file name
+** printf
+AWK contains the full flegded C printf	funtion with wich we can format the output
+
+* Tar
+GNU [[man:tar][tar]]	is an archiving program designed to store multiple files in a single file (an archive), and to manipulate such archives.
+
+| Operation Mode | Detail	|
+|----------------+---------|
+| -c	           | create  |
+| -d	           | delete  |
+| -t	           | list    |
+| -x	           | extract |
+
+
+| Options | detail	                        |
+|---------+---------------------------------|
+| -c	    | Verbose                         |
+| -d	    | Specify File name of the archiv |
+| -t	    | filter the archive through bzip |
+| -x	    | filter the archive through gzip |
+
+** Examples
+- Using Create Command
+	  #+BEGIN_SRC shell
+	  tar cvf <archive name> <files>
+	  #+END_SRC
+	  creates a tar archive containing all the files 
+	  #+BEGIN_SRC shell
+	  tar cvzf <archive name> <files>
+	  #+END_SRC
+	  creates a gziped archive
+	  #+BEGIN_SRC shell
+	  tar cvjf <archive name> <files>
+	  #+END_SRC
+	  creates a bzip2 archive
+- Using Extract Command
+	  #+BEGIN_SRC shell
+	  tar xvf <archive name>
+	  #+END_SRC
+	  Extracts  the archive
+	  #+BEGIN_SRC shell
+	  tar xvzf <archive name> 
+	  #+END_SRC
+	  Extracts gzip file
+- List Archive
+	  #+BEGIN_SRC shell
+	  tar -tvf <archive name>
+	  #+END_SRC
+	  List all the content of the archive
+
+* RegEx
+The most important part is the concepts. Once you understand how the building blocks work, differences in syntax amount to little more than mild
+dialects. A layer on top of your regular expression engine's syntax is the syntax of the programming language you're using. 
+Languages such as Perl remove most of this complication, but you'll have to keep in mind other considerations if you're using regular expressions
+in a C program.
+
+If you think of regular expressions as building blocks that you can mix and match as you please, it helps you learn how to write and debug your 
+own patterns but also how to understand patterns written by others.
+** Start simple
+
+Conceptually, the simplest regular expressions are literal characters. The pattern ~N~ matches the character 'N'.
+
+Regular expressions next to each other match sequences. For example, the pattern ~Nick~ matches the sequence 'N' followed by 
+'i' followed by 'c' followed by 'k'.
+
+If you've ever used grep on Unix—even if only to search for ordinary looking strings—you've already been using regular expressions! 
+(The re in grep refers to regular expressions.)
+** Little Complexity
+Adding just a little complexity, you can match either 'Nick' or 'nick' with the pattern ~[Nn]ick~. The part in square brackets is a character
+class, which means it matches exactly one of the enclosed characters. You can also use ranges in character classes, so ~[a-c]~ matches either 
+'a' or 'b' or 'c'.
+Specifing ~^~ on the begening tells to exculde ex: [^aeiou] matches everything exept	"aeiou"
+
+The pattern ~.~ is special: rather than matching a literal dot only, it matches any character . It's the same conceptually as the really big 
+character class ~[-.?+%$A-Za-z0-9...]~.
+** Helpfull Shortcut
+Using . can save you lots of typing, and there are other shortcuts for common patterns. Say you want to match non-negative integers: 
+one way to write that is ~[0-9]+~. Digits are a frequent match target, 
+so you could instead use ~\d+~ match non-negative integers. Others are ~\s~ (whitespace) and ~\w~ (word characters: alphanumerics or underscore).
+
+The uppercased variants are their complements, so ~\S~ matches any non-whitespace character, for example.
+** Once is not enough
+
+From there, you can repeat parts of your pattern with quantifiers. For example, the pattern ~ab?c~ matches 'abc' or 'ac' because the 
+? quantifier makes the subpattern it modifies optional. Other quantifiers are
+
+	  * (zero or more times)
+	  + (one or more times)
+	  {n} (exactly n times)
+	  {n,} (at least n times)
+	  {n,m} (at least n times but no more than m times)
+
+Putting some of these blocks together, the pattern ~[Nn]*ick~ matches all of
+
+	  ick
+	  Nick
+	  nick
+	  Nnick
+	  nNick
+	  nnick
+	  (and so on)
+
+The first match demonstrates an important lesson: * always succeeds! Any pattern can match zero times.
+** Grouping
+
+A quantifier modifies the pattern to its immediate left. You might expect ~0abc+0~ to match '0abc0', '0abcabc0', and so forth, 
+but the pattern immediately to the left of the plus quantifier is c. This means ~0abc+0~ matches '0abc0', '0abcc0', '0abccc0', and so on.
+
+To match one or more sequences of 'abc' with zeros on the ends, use 0(abc)+0. The parentheses denote a subpattern that can be quantified 
+as a unit. It's also common for regular expression engines to save or "capture" the portion of the input text that matches a parenthesized 
+group.
+Subexpressions or groups are surrounded by ( and ), or sometimes \( and \). They serve two purposes; firstly they override the precedence
+rules of other operators, and secondly they "capture" part of the text matched by a regexp. This can then be used later on in the regexp via 
+the \digit syntax (this is called a back-reference) or outside the regexp to extract the appropriate part of a string.
+** Alternation
+
+Earlier, we saw one way to match either 'Nick' or 'nick'. Another is with alternation as in Nick|nick. Remember that alternation includes 
+everything to its left and everything to its right. Use grouping parentheses to limit the scope of |, e.g., (Nick|nick).
+
+For another example, you could equivalently write [a-c] as a|b|c, but this is likely to be suboptimal because many implementations assume 
+alternatives will have lengths greater than 1.
+** Escaping
+
+Although some characters match themselves, others have special meanings. The pattern ~\d+~ doesn't match backslash followed by lowercase D followed by a plus sign: to get that, we'd use ~\\d\+~.
+ A backslash removes the special meaning from the following character.
+** Greediness
+
+Regular expression quantifiers are greedy. This means they match as much text as they possibly can while allowing the entire pattern to match 
+successfully.
+
+For example, say the input is
+
+	  ~"Hello," she said, "How are you?"~
+
+You might expect ".+" to match only 'Hello,' and will then be surprised when you see that it matched from 'Hello' all the way through 'you?'.
+
+To switch from greedy to what you might think of as cautious, add an extra ~?~ to the quantifier. Now you understand how ~\((.+?)\)~,
+ the example from your question works. It matches the sequence of a literal left-parenthesis, followed by one or more characters, 
+and terminated by a right-parenthesis.
+
+If your input is '(123) (456)', then the first capture will be '123'. Non-greedy quantifiers want to allow the rest of the pattern to start
+matching as soon as possible.
+
+** Anchors
+
+Use the special pattern ~^~ to match only at the beginning of your input and ~$~ to match only at the end. Making "bookends" with your
+patterns where you say, "I know what's at the front and back, but give me everything between" is a useful technique.
+
+Say you want to match comments of the form
+
+	  -- This is a comment --
+
+you'd write ~^--\s+(.+)\s+--$~
+
+
+
+
+
+** Quick Refrence
+|---------------------------+--------------------------------|
+| Character casses          |                                |
+|---------------------------+--------------------------------|
+| .                         | any character except newline   |
+| \w \d \s                  | word, digit, whitespace        |
+| \W \D \S                  | not word, digit, whitespace    |
+| [abc]                     | any of a, b, or c              |
+| [^abc]                    | not a, b, or c                 |
+| [a-g]                     | character between a & g        |
+|---------------------------+--------------------------------|
+| Anchors                   |                                |
+|---------------------------+--------------------------------|
+| ^abc$                     | start / end of the string      |
+| \b \B                     | word, not-word boundary        |
+|---------------------------+--------------------------------|
+| Escaped characters        |                                |
+|---------------------------+--------------------------------|
+| \. \* \\                  | escaped special characters     |
+| \t \n \r                  | tab, linefeed, carriage return |
+| \u00A9                    | unicode escaped ©              |
+|---------------------------+--------------------------------|
+| Groups & Lookaround       |                                |
+|---------------------------+--------------------------------|
+| (abc)                     | capture group                  |
+| \1                        | backreference to group #1      |
+| (?:abc)                   | non-capturing group            |
+| (?=abc)                   | positive lookahead             |
+| (?!abc)                   | negative lookahead             |
+|---------------------------+--------------------------------|
+| Quantifiers & Alternation |                                |
+|---------------------------+--------------------------------|
+| a* a+ a?                  | 0 or more, 1 or more, 0 or 1   |
+| a{5} a{2,}                | exactly five, two or more      |
+| a{1,3}                    | between one & three            |
+| a+? a{2,}?                | match as few as possible       |
+|---------------------------+--------------------------------|
+
+
+** FootNote
+[[http://www.grymoire.com/Unix/Regular.html][1.Grymoire]]
+[[https://stackoverflow.com/questions/4736/learning-regular-expressions][2.Stack]]
+[[http://www.greenend.org.uk/rjk/tech/regexp.html][3.CheetSheet]]
+[[https://www.youtube.com/watch?v=6pqhDjQKWng][4.Howard Adrams]] 
+
