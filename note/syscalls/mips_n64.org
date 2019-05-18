@@ -1,3 +1,4 @@
+#+STARTUP: showall
 
 * Syscalls Table 
 |   No | Name                   | param0 | param1                             | param2                                 | param3                                | param4                          | param5                                | param6              | Definition                             |

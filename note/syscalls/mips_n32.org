@@ -1,3 +1,4 @@
+#+STARTUP: showall
 | 6000 | [[link:http://www.manpages.info/linux/read.2.html][read]]  | 0x1770 | unsigned int fd | char *buf | size_t count | - | - | - | [[link:http://lxr.free-electrons.com/source/fs/read_write.c?3.5#L460][fs/read_write.c:460]]  |
 | 6001 | [[link:http://www.manpages.info/linux/write.2.html][write]]  | 0x1771 | unsigned int fd | const char *buf | size_t count | - | - | - | [[link:http://lxr.free-electrons.com/source/fs/read_write.c?3.5#L477][fs/read_write.c:477]]  |
 | 6002 | [[link:http://www.manpages.info/linux/open.2.html][open]]  | 0x1772 | const char *filename | int flags | umode_t mode | - | - | - | [[link:http://lxr.free-electrons.com/source/fs/open.c?3.5#L1046][fs/open.c:1046]]  |
